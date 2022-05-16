@@ -1,9 +1,10 @@
 import requests
 from bs4 import BeautifulSoup
 
-url = "https://www.bbc.com/zhongwen/trad/topics/c83plve5vmjt"
+bbc_main = "https://www.bbc.com"
+bbc_url = "https://www.bbc.com/zhongwen/trad/topics/c83plve5vmjt"
 
-response = requests.get(url)
+response = requests.get(bbc_url)
 
 soup = BeautifulSoup(response.text, "lxml")
 titles = soup.find_all("span", {"class": "lx-stream-post__header-text gs-u-align-middle"})
@@ -12,4 +13,16 @@ title_list = []
 for title in titles:
     title_list.append(title.getText())
 
-print(title_list)
+# print(title_list)
+
+urls = soup.find_all("a", {"class": "qa-heading-link lx-stream-post__header-link"})
+
+tag_list = []
+for url in urls:
+    sub_response = requests.get(bbc_main + url.get("href"))
+    sub_soup = BeautifulSoup(sub_response.text, "lxml")
+    tags = sub_soup.find_all("li", {"class": "bbc-1msyfg1 e1hq59l0"})
+    for tag in tags:
+        tag_list.append(tag.getText())
+
+print(tag_list)
